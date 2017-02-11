@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import excel_doctor_extract
 from Bio import Entrez
 import time
 import codecs
@@ -36,38 +35,42 @@ def fetch_details(id_list):
         return None
 
 
+def capture_abstracts():
+    doctor_names_filehandle = codecs.open("doctor_names.txt", "r", "utf-8")
+    doctor_articles_filehandle = codecs.open("doctor_articles.txt", "w", "utf-8")
+
+    for doctor_name in doctor_names_filehandle.readlines():
+
+        doctor_name = doctor_name.strip()
+        time.sleep(1)
+        id_list = search(doctor_name)
+
+        if id_list:
+
+            id_details = fetch_details(id_list)
+            if id_details:
+
+                pubmed_articles = id_details['PubmedArticle']
+                for pubmed_article in pubmed_articles:
+
+                    try:
+                        pmid = pubmed_article['MedlineCitation']['PMID']
+                    except:
+                        pmid = ""
+                    try:
+                        article_title = pubmed_article['MedlineCitation']['Article']['ArticleTitle']
+                    except:
+                        article_title = ""
+                    try:
+                        journal_title = pubmed_article['MedlineCitation']['Article']['Journal']['Title']
+                    except:
+                        journal_title = ""
+                    try:
+                        abstract = " ".join(pubmed_article['MedlineCitation']['Article']['Abstract']['AbstractText'])
+                    except:
+                        abstract = ""
+
+                    doctor_articles_filehandle.write("|".join([doctor_name, pmid, journal_title, article_title, abstract]) + "\n")
+
 if __name__ == "__main__":
-
-    with codecs.open("doctor_articles.txt", "w", "utf-8") as file_handle:
-
-        column_names = ['doctor_name', 'pmid', 'journal_title', 'article_title', 'abstract']
-
-        file_handle.write("|".join(column_names) + "\n")
-
-        excel_doctor_extract = excel_doctor_extract.ExcelDoctorExtract()
-        doctor_names = excel_doctor_extract.parse('Faculty TOBI 2010-2016 & 2017.xlsx')
-        for doctor_name in doctor_names:
-            time.sleep(1)
-            id_list = search(doctor_name)
-            if id_list:
-                id_details = fetch_details(id_list)
-                if id_details:
-                    for id_detail in id_details:
-                        try:
-                            pmid = id_detail['MedlineCitation']['PMID']
-                        except:
-                            pmid = ""
-                        try:
-                            article_title = id_detail['MedlineCitation']['Article']['ArticleTitle']
-                        except:
-                            article_title = ""
-                        try:
-                            journal_title = id_detail['MedlineCitation']['Article']['Journal']['Title']
-                        except:
-                            journal_title = ""
-                        try:
-                            abstract = " ".join(id_detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
-                        except:
-                            abstract = ""
-                        file_handle.write("|".join([doctor_name, pmid, journal_title, article_title, abstract]) + "\n")
-
+    capture_abstracts()
