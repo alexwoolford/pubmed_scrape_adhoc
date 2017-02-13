@@ -1,3 +1,4 @@
 *.pyc
 *.xlsx
 .idea/
+doctor_articles.txt

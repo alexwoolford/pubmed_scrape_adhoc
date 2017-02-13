@@ -66,11 +66,16 @@ def capture_abstracts():
                     except:
                         journal_title = ""
                     try:
+                        date_created_dict = pubmed_article['MedlineCitation']['DateCreated']
+                        date_created = "{0}/{1}/{2}".format(date_created_dict.get('Month'), date_created_dict.get('Day'), date_created_dict.get('Year'))
+                    except:
+                        date_created = ""
+                    try:
                         abstract = " ".join(pubmed_article['MedlineCitation']['Article']['Abstract']['AbstractText'])
                     except:
                         abstract = ""
 
-                    doctor_articles_filehandle.write("|".join([doctor_name, pmid, journal_title, article_title, abstract]) + "\n")
+                    doctor_articles_filehandle.write("|".join([doctor_name, pmid, journal_title, article_title, date_created, abstract]) + "\n")
 
 if __name__ == "__main__":
     capture_abstracts()
