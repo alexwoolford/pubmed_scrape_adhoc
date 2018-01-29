@@ -66,8 +66,22 @@ def capture_abstracts():
                     except:
                         journal_title = ""
                     try:
-                        article_date_dict = pubmed_article['MedlineCitation']['Article']['ArticleDate'][0]
-                        article_date = "{0}/{1}/{2}".format(article_date_dict.get('Month'), article_date_dict.get('Day'), article_date_dict.get('Year'))
+
+                        if len(pubmed_article['MedlineCitation']['Article']['ArticleDate']) > 0:
+                            article_date_dict = pubmed_article.get('MedlineCitation').get('Article').get('ArticleDate')[0]
+                            article_date = "{0}/{1}/{2}".format(article_date_dict.get('Month'), article_date_dict.get('Day'), article_date_dict.get('Year'))
+                        elif pubmed_article.get('MedlineCitation').get('DateCompleted'):
+                            article_date_dict = pubmed_article['MedlineCitation']['DateCompleted']
+                            article_date = "{0}/{1}/{2}".format(article_date_dict.get('Month'),
+                                                                article_date_dict.get('Day'),
+                                                                article_date_dict.get('Year'))
+                        elif pubmed_article.get('MedlineCitation').get('DateRevised'):
+                            article_date_dict = pubmed_article['MedlineCitation']['DateRevised']
+                            article_date = "{0}/{1}/{2}".format(article_date_dict.get('Month'),
+                                                                article_date_dict.get('Day'),
+                                                                article_date_dict.get('Year'))
+                        else:
+                            article_date = ""
                     except:
                         article_date = ""
                     try:
